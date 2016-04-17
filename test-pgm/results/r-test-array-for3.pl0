@@ -1,0 +1,8 @@
+Compiling test-array-for3.pl0
+    11   for i: [1..] do // upper bound is global i
+******              ^  Error: PL0 syntax error
+Parsing complete
+    11   for i: [1..] do // upper bound is global i
+******           ^  Error: types of upper and lower bounds must match
+Static semantic analysis complete
+2 errors detected.

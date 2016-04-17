@@ -1,0 +1,6 @@
+begin
+  for i : [100..105] do
+    write i
+  od
+end
+

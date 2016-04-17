@@ -1,0 +1,8 @@
+Compiling test-array-for1.pl0
+     9   for i: 1..N do
+******          ^  Error: PL0 syntax error
+    11   for i: 1..N do
+******          ^  Error: PL0 syntax error
+Parsing complete
+Static semantic analysis complete
+2 errors detected.

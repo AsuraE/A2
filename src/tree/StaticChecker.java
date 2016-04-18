@@ -193,29 +193,36 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
     }
     
     public void visitForNode(StatementNode.ForNode node) {
-    	// TODO
     	beginCheck("For");
     	// Check the conditions.
-    	ExpNode c1 = checkCondition( node.getCondition1() );
+    	ExpNode c1 = node.getCondition1().transform( this );
+    	ExpNode c2 = node.getCondition2().transform( this );
     	node.setCondition1( c1 );
-    	c1 = Type.optDereferenceExp( c1 ).transform( this );
-    	ExpNode c2 = checkCondition( node.getCondition2() );
     	node.setCondition2( c2 );
+    	c1 = Type.optDereferenceExp( c1 ).transform( this );
     	c2 = Type.optDereferenceExp( c2 ).transform( this );
     	// Dereference check
     	if( !(c1.getType().equals( c2.getType() ) ) ) {
     		c1 = c1.getType().optWidenSubrange().coerceExp( c1 ).transform( this );
     		c2 = c2.getType().optWidenSubrange().coerceExp( c2 ).transform( this );
     	}
+    	node.setCondition1( c1 );
+    	node.setCondition2( c2 );
     	// Widen Subrange check
     	if( !(c1.getType().equals( c2.getType() ) ) ) {
     		errors.error( "Types are not coercible", node.getPosition() );
     	}
-    	
-    	
-    	
+    	// Declare the control variable of the for loop
+    	symtab.extendCurrentScope();
+    	ExpNode.IdentifierNode v = (ExpNode.IdentifierNode)node.getControlVariable();
+    	SymEntry.VarEntry symEntry = symtab.getCurrentScope().addVariable( v.getId(), v.getPosition(), new Type.ReferenceType( v.getType() ) );
+    	symEntry.setControlVar( true );
+    	// Check the control variable
+    	node.setControlVariable( node.getControlVariable().transform( this ) );
     	// Check the body of the loop.
     	node.getLoopStmt().accept( this );
+    	// Leave the scope
+    	symtab.leaveExtendedScope();  
     	endCheck("For");
     }
     /*************************************************

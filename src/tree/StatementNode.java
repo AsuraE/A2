@@ -374,8 +374,9 @@ public abstract class StatementNode {
     	private ExpNode c1;
     	private ExpNode c2;
     	private StatementNode sl;
+    	private Scope localScope;
     	
-    	public ForNode( Position pos, ExpNode id, ExpNode c1, ExpNode c2, StatementNode sl ) {
+    	public ForNode( Position pos, ExpNode id, ExpNode c1, ExpNode c2, StatementNode sl, Scope localScope ) {
     		super( pos );
     		this.controlVariable = id;
     		this.c1 = c1;
@@ -410,6 +411,9 @@ public abstract class StatementNode {
 		}
 		public void setControlVariable( ExpNode controlVariable ) {
 			this.controlVariable = controlVariable;
+		}
+		public Scope getLocalScope() {
+			return localScope;
 		}
 		@Override
 		public String toString(int level) {

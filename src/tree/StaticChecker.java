@@ -196,8 +196,24 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
     	// TODO
     	beginCheck("For");
     	// Check the conditions.
-    	node.setCondition1( checkCondition( node.getCondition1() ) );
-    	node.setCondition2( checkCondition( node.getCondition2() ) );
+    	ExpNode c1 = checkCondition( node.getCondition1() );
+    	node.setCondition1( c1 );
+    	c1 = Type.optDereferenceExp( c1 ).transform( this );
+    	ExpNode c2 = checkCondition( node.getCondition2() );
+    	node.setCondition2( c2 );
+    	c2 = Type.optDereferenceExp( c2 ).transform( this );
+    	// Dereference check
+    	if( !(c1.getType().equals( c2.getType() ) ) ) {
+    		c1 = c1.getType().optWidenSubrange().coerceExp( c1 ).transform( this );
+    		c2 = c2.getType().optWidenSubrange().coerceExp( c2 ).transform( this );
+    	}
+    	// Widen Subrange check
+    	if( !(c1.getType().equals( c2.getType() ) ) ) {
+    		errors.error( "Types are not coercible", node.getPosition() );
+    	}
+    	
+    	
+    	
     	// Check the body of the loop.
     	node.getLoopStmt().accept( this );
     	endCheck("For");

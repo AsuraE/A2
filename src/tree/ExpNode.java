@@ -341,4 +341,24 @@ public abstract class ExpNode {
             return "WidenSubrange(" + exp + ":" + getType() + ")";
         }
     }
+    
+    /** Tree node representing an array */
+    public static class ArrayNode extends ExpNode {
+    	
+    	public ArrayNode( Position pos, ExpNode lval, ExpNode cond ) {
+    		super( pos );
+    	}
+    	@Override
+    	public ExpNode transform( ExpTransform<ExpNode> visitor ) {
+    		return visitor.visitArrayNode( this );
+    	}
+    	@Override
+    	public Code genCode( ExpTransform<Code> visitor ) {
+    		return visitor.visitArrayNode( this );
+    	}
+    	@Override
+    	public String toString() {
+    		return "";
+    	}
+    }
 }

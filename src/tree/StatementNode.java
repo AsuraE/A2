@@ -367,5 +367,54 @@ public abstract class StatementNode {
                 newLine(level+1) + loopStmt.toString( level+1 );
         }
     }
+    
+    /** Tree node representing a "for" statement. */
+    public static class ForNode extends StatementNode {
+    	private ExpNode controlVariable;
+    	private ExpNode c1;
+    	private ExpNode c2;
+    	private StatementNode sl;
+    	
+    	public ForNode( Position pos, ExpNode id, ExpNode c1, ExpNode c2, StatementNode sl ) {
+    		super( pos );
+    		this.controlVariable = id;
+    		this.c1 = c1;
+    		this.c2 = c2;
+    		this.sl = sl;
+    	}
+		@Override
+		public void accept(StatementVisitor visitor) {
+			visitor.visitForNode( this );
+		}
+		@Override
+		public Code genCode(StatementTransform<Code> visitor) {
+			return visitor.visitForNode( this );
+		}
+		public ExpNode getCondition1() {
+			return c1;
+		}
+		public ExpNode getCondition2() {
+			return c2;
+		}
+		public void setCondition1( ExpNode c1 ) {
+			this.c1 = c1;
+		}
+		public void setCondition2( ExpNode c2 ) {
+			this.c2 = c2;
+		}
+		public StatementNode getLoopStmt() {
+			return sl;
+		}
+		public ExpNode getControlVariable() {
+			return controlVariable;
+		}
+		public void setControlVariable( ExpNode controlVariable ) {
+			this.controlVariable = controlVariable;
+		}
+		@Override
+		public String toString(int level) {
+			return "";
+		}
+    }
 }
 

@@ -338,6 +338,10 @@ Type ::= TypeIdentifier:type
         {:
             RESULT = new Type.SubrangeType( lo, hi );
         :}
+    | KW_ARRAY Type:index KW_OF Type:element
+        {:
+        	RESULT = new Type.ArrayType( index, element );
+        :}
     | error:err
         {:
             RESULT = Type.ERROR_TYPE;
@@ -436,6 +440,11 @@ Statement ::= KW_WHILE Condition:c KW_DO Statement:s
         {: 
             RESULT = new StatementNode.IfNode( new Position(cleft), c, s1, s2 );
         :}
+    |  KW_FOR IDENTIFIER:id COLON LBRACKET Condition:c1 RANGE Condition:c2 RBRACKET KW_DO StatementList:sl KW_OD
+    	{:
+			RESULT = new StatementNode.ForNode( new Position(idleft), 
+					new ExpNode.IdentifierNode( new Position( idleft), id ), c1, c2, sl );
+		:}
     |  CompoundStatement:s
         {: 
             RESULT = s; 
@@ -471,7 +480,11 @@ ActualParamList ::= /* empty */
 LValue ::= IDENTIFIER:id
         {:
             RESULT = new ExpNode.IdentifierNode( new Position(idleft), id );
-        :}
+        :}    
+    |  LValue:lval LBRACKET Condition:cond RBRACKET
+    	{:
+    		RESULT = new ExpNode.ArrayNode( new Position(lvalleft), lval, cond );
+    	:}
     ;
 
 /* To allow for adding logical expressions. */

@@ -28,4 +28,6 @@ public interface  StatementTransform<ResultType> {
     ResultType visitIfNode( StatementNode.IfNode node);
 
     ResultType visitWhileNode( StatementNode.WhileNode node);
+    
+    ResultType visitForNode( StatementNode.ForNode node);
 }

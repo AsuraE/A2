@@ -199,6 +199,12 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
         code.genJumpAlways( -(code.size() + Code.SIZE_JUMP_ALWAYS) );
         return code;
     }
+    
+    /** Generate code for a "for" statement */
+	public Code visitForNode(ForNode node) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     /*************************************************
      *  Expression node code generation visit methods
      *************************************************/
@@ -354,6 +360,10 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
         // Widening doesn't require anything extra
         return node.getExp().genCode( this );
     }
-
-
+    
+	/** Generate code for an array node */
+	public Code visitArrayNode(ExpNode.ArrayNode node) {
+		// TODO
+		return null;
+	}
 }

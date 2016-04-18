@@ -191,6 +191,17 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
         node.getLoopStmt().accept( this );
         endCheck("While");
     }
+    
+    public void visitForNode(StatementNode.ForNode node) {
+    	// TODO
+    	beginCheck("For");
+    	// Check the conditions.
+    	node.setCondition1( checkCondition( node.getCondition1() ) );
+    	node.setCondition2( checkCondition( node.getCondition2() ) );
+    	// Check the body of the loop.
+    	node.getLoopStmt().accept( this );
+    	endCheck("For");
+    }
     /*************************************************
      *  Expression node static checker visit methods.
      *  The static checking visitor methods for expressions
@@ -367,6 +378,10 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
         endCheck("WidenSubrange");
         return node;
     }
+	
+	public ExpNode visitArrayNode(ExpNode.ArrayNode node) {
+		return null;
+	}
 
     /**************************** Support Methods ***************************/
     /** Push current node onto debug rule stack and increase debug level */

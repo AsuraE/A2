@@ -531,11 +531,9 @@ public abstract class Type
             this.resultType = result;
         }
         public Type getArgType() {
-            assert resolved;
             return argType;
         }
         public Type getResultType() {
-            assert resolved;
             return resultType;
         }
         /** Resolve identifier references anywhere within type */

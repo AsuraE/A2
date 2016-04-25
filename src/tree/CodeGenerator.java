@@ -202,8 +202,43 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
     
     /** Generate code for a "for" statement */
 	public Code visitForNode(ForNode node) {
-		// TODO Auto-generated method stub
-		return null;
+		/* New empty codes */
+		Code code = new Code();
+		Code conditionCode = new Code();
+		Code bodyCode = new Code();
+		/* Generate the code to evaluate the start condition */
+		code.append( node.getCondition1().genCode( this ) );
+		/* Generate the code to load and store the control variable */
+		code.append( node.getControlVariable().genCode( this ) );
+		code.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		/* Generate the code to evaluate the end condition */
+		code.append( node.getCondition2().genCode( this ) );
+		/* Generate duplicate code for comparison */
+		conditionCode.append( node.getControlVariable().genCode( this ) );
+		conditionCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		conditionCode.append( node.getCondition2().genCode( this ) );
+		/* Generate less operation */
+		conditionCode.generateOp( Operation.LESS );
+		/* Generate the code for the loop body */
+		bodyCode.append( node.getLoopStmt().genCode( this ) );
+		/* Increment the control variable */
+		bodyCode.append( node.getControlVariable().genCode( this ) );
+		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		bodyCode.genLoadConstant( 1 );
+		bodyCode.generateOp( Operation.ADD );
+		/* Store the incremented value */
+		bodyCode.append( node.getControlVariable().genCode( this ) );
+		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		/* Append the condition code */
+		code.append( conditionCode );
+		/* Add a branch over the loop body if false */
+		code.genJumpIfFalse( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE );
+		/* Append the body code to the main code */
+		code.append( bodyCode );
+		/* Jump back to start of code execution */
+		code.genJumpAlways( -(bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + Code.SIZE_JUMP_ALWAYS + 
+				conditionCode.size()) );
+		return code;
 	}
     /*************************************************
      *  Expression node code generation visit methods

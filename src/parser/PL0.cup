@@ -148,7 +148,8 @@ non terminal ConstExp         Constant;
 non terminal                  TypeDefSeq, 
                               TypeDef;
 non terminal Type             Type,
-                              TypeIdentifier;
+                              TypeIdentifier,
+                              ArrayType;
 non terminal                  VarDeclSeq, 
                               VarDecl;
 non terminal DeclNode.ProcedureNode ProcedureDef;

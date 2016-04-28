@@ -382,6 +382,7 @@ public abstract class StatementNode {
     		this.c1 = c1;
     		this.c2 = c2;
     		this.sl = sl;
+    		this.localScope = localScope;
     	}
 		@Override
 		public void accept(StatementVisitor visitor) {
@@ -417,7 +418,9 @@ public abstract class StatementNode {
 		}
 		@Override
 		public String toString(int level) {
-			return "";
+			return "FOR " + controlVariable.toString() + ": [" + 
+                    c1.toString() + ".." + 
+                    c2.toString() + "] DO " + sl.toString();
 		}
     }
 }

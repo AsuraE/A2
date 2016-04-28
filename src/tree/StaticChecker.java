@@ -215,7 +215,8 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
     	// Declare the control variable of the for loop
     	symtab.extendCurrentScope();
     	ExpNode.IdentifierNode v = (ExpNode.IdentifierNode)node.getControlVariable();
-    	SymEntry.VarEntry symEntry = symtab.getCurrentScope().addVariable( v.getId(), v.getPosition(), new Type.ReferenceType( v.getType() ) );
+    	SymEntry.VarEntry symEntry = symtab.getCurrentScope().addVariable( v.getId(), v.getPosition(), 
+    			new Type.ReferenceType( v.getType() ) );
     	symEntry.setControlVar( true );
     	// Check the control variable
     	node.setControlVariable( node.getControlVariable().transform( this ) );

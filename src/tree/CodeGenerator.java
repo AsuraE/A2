@@ -208,36 +208,51 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		Code bodyCode = new Code();
 		/* Generate the code to evaluate the start condition */
 		code.append( node.getCondition1().genCode( this ) );
-		/* Generate the code to load and store the control variable */
+		/* Generate the code to store the control variable at the start condition */
 		code.append( node.getControlVariable().genCode( this ) );
 		code.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
 		/* Generate the code to evaluate the end condition */
 		code.append( node.getCondition2().genCode( this ) );
-		/* Generate duplicate code for comparison */
+		/* Generate code for comparison */
+		/* Load control variable */
 		conditionCode.append( node.getControlVariable().genCode( this ) );
-		conditionCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		conditionCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		/* Evaluate end condition */
 		conditionCode.append( node.getCondition2().genCode( this ) );
 		/* Generate less operation */
 		conditionCode.generateOp( Operation.LESS );
+		
+		conditionCode.generateOp( Operation.DUP );
+		conditionCode.generateOp( Operation.WRITE);
+		
+		bodyCode.append( node.getControlVariable().genCode( this ) );
+		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		bodyCode.generateOp( Operation.WRITE);
+		
 		/* Generate the code for the loop body */
 		bodyCode.append( node.getLoopStmt().genCode( this ) );
+		
 		/* Increment the control variable */
 		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
 		bodyCode.genLoadConstant( 1 );
-		bodyCode.generateOp( Operation.ADD );
+		bodyCode.generateOp( Operation.ADD );		
 		/* Store the incremented value */
 		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );	
+		
+		bodyCode.append( node.getControlVariable().genCode( this ) );
+		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		bodyCode.generateOp( Operation.WRITE);
+		
 		/* Append the condition code */
 		code.append( conditionCode );
 		/* Add a branch over the loop body if false */
-		code.genJumpIfFalse( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE );
+		code.genJumpIfFalse( bodyCode.size() + Code.SIZE_JUMP_ALWAYS );
 		/* Append the body code to the main code */
 		code.append( bodyCode );
 		/* Jump back to start of code execution */
-		code.genJumpAlways( -(bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + Code.SIZE_JUMP_ALWAYS + 
-				conditionCode.size()) );
+		code.genJumpAlways( -( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + Code.SIZE_JUMP_ALWAYS + conditionCode.size() ) );
 		return code;
 	}
     /*************************************************

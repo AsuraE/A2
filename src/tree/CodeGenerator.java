@@ -206,31 +206,34 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		Code code = new Code();
 		Code conditionCode = new Code();
 		Code bodyCode = new Code();
+		/* Condition and control codes */
+		Code startCond = node.getCondition1().genCode( this );
+		Code endCond = node.getCondition2().genCode( this );
+		Code conVar = node.getControlVariable().genCode( this );
+		/* RefTypes */
+		Type.ReferenceType conVarType = (Type.ReferenceType)node.getControlVariable().getType();
 		/* Generate the code to evaluate the start condition */
-		code.append( node.getCondition1().genCode( this ) );
+		code.append( startCond );
 		/* Generate the code to store the control variable at the start condition */
-		code.append( node.getControlVariable().genCode( this ) );
-		code.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );
-		/* Generate the code to evaluate the end condition */
-		code.append( node.getCondition2().genCode( this ) );
+		code.append( conVar );
+		code.append( genStore( conVarType ) );
 		/* Generate code for comparison */
 		/* Load control variable */
 		conditionCode.append( node.getControlVariable().genCode( this ) );
-		conditionCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		conditionCode.append( genLoad( conVarType ) );
 		/* Evaluate end condition */
-		conditionCode.append( node.getCondition2().genCode( this ) );
+		conditionCode.append( endCond );
 		/* Generate less operation */
 		conditionCode.generateOp( Operation.LESSEQ );
 		/* Generate the code for the loop body */
 		bodyCode.append( node.getLoopStmt().genCode( this ) );
-		/* Increment the control variable */
-		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
+		/* Increment the control variable and store it */
+		bodyCode.append( conVar );
+		bodyCode.append( genLoad( conVarType ) );
 		bodyCode.genLoadConstant( 1 );
-		bodyCode.generateOp( Operation.ADD );		
-		/* Store the incremented value */
-		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );	
+		bodyCode.generateOp( Operation.ADD );
+		bodyCode.append( conVar );
+		bodyCode.append( genStore( conVarType ) );	
 		/* Append the condition code */
 		code.append( conditionCode );
 		/* Add a branch over the loop body if false */
@@ -238,7 +241,8 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Append the body code to the main code */
 		code.append( bodyCode );
 		/* Jump back to start of code execution */
-		code.genJumpAlways( -( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + Code.SIZE_JUMP_ALWAYS + conditionCode.size() ) );
+		code.genJumpAlways( -( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + 
+				Code.SIZE_JUMP_ALWAYS + conditionCode.size() ) );
 		return code;
 	}
     /*************************************************

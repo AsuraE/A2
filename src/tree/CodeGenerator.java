@@ -220,11 +220,9 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Evaluate end condition */
 		conditionCode.append( node.getCondition2().genCode( this ) );
 		/* Generate less operation */
-		conditionCode.generateOp( Operation.LESS );
-		
+		conditionCode.generateOp( Operation.LESSEQ );
 		/* Generate the code for the loop body */
 		bodyCode.append( node.getLoopStmt().genCode( this ) );
-		
 		/* Increment the control variable */
 		bodyCode.append( node.getControlVariable().genCode( this ) );
 		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
@@ -233,7 +231,6 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Store the incremented value */
 		bodyCode.append( node.getControlVariable().genCode( this ) );
 		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );	
-		
 		/* Append the condition code */
 		code.append( conditionCode );
 		/* Add a branch over the loop body if false */

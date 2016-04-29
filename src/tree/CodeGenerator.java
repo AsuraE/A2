@@ -222,13 +222,6 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Generate less operation */
 		conditionCode.generateOp( Operation.LESS );
 		
-		conditionCode.generateOp( Operation.DUP );
-		conditionCode.generateOp( Operation.WRITE);
-		
-		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
-		bodyCode.generateOp( Operation.WRITE);
-		
 		/* Generate the code for the loop body */
 		bodyCode.append( node.getLoopStmt().genCode( this ) );
 		
@@ -240,10 +233,6 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Store the incremented value */
 		bodyCode.append( node.getControlVariable().genCode( this ) );
 		bodyCode.append( genStore( (Type.ReferenceType)node.getControlVariable().getType() ) );	
-		
-		bodyCode.append( node.getControlVariable().genCode( this ) );
-		bodyCode.append( genLoad( (Type.ReferenceType)node.getControlVariable().getType() ) );
-		bodyCode.generateOp( Operation.WRITE);
 		
 		/* Append the condition code */
 		code.append( conditionCode );

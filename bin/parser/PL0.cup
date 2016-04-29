@@ -443,10 +443,7 @@ Statement ::= KW_WHILE Condition:c KW_DO Statement:s
         :}
     |  KW_FOR IDENTIFIER:id COLON LBRACKET Condition:c1 RANGE Condition:c2 RBRACKET KW_DO StatementList:sl KW_OD
     	{:
-			Scope localScope = symtab.extendCurrentScope();
-			symtab.leaveExtendedScope();
-			RESULT = new StatementNode.ForNode( new Position(idleft), 
-					new ExpNode.IdentifierNode( new Position( idleft), id ), c1, c2, sl, localScope );
+			RESULT = new StatementNode.ForNode( new Position(idleft), id, c1, c2, sl );
 		:}
     |  CompoundStatement:s
         {: 

@@ -374,15 +374,15 @@ public abstract class StatementNode {
     	private ExpNode c1;
     	private ExpNode c2;
     	private StatementNode sl;
-    	private Scope localScope;
+    	private String id;
     	
-    	public ForNode( Position pos, ExpNode id, ExpNode c1, ExpNode c2, StatementNode sl, Scope localScope ) {
+    	public ForNode( Position pos, String id, ExpNode c1, ExpNode c2, StatementNode sl ) {
     		super( pos );
-    		this.controlVariable = id;
+    		this.id = id;
+    		this.controlVariable = new ExpNode.IdentifierNode( pos, id );
     		this.c1 = c1;
     		this.c2 = c2;
     		this.sl = sl;
-    		this.localScope = localScope;
     	}
 		@Override
 		public void accept(StatementVisitor visitor) {
@@ -413,8 +413,8 @@ public abstract class StatementNode {
 		public void setControlVariable( ExpNode controlVariable ) {
 			this.controlVariable = controlVariable;
 		}
-		public Scope getLocalScope() {
-			return localScope;
+		public String getId() {
+			return id;
 		}
 		@Override
 		public String toString(int level) {

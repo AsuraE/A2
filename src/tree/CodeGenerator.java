@@ -259,6 +259,10 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Jump back to start of code execution */
 		code.genJumpAlways( -( bodyCode.size() + Code.SIZE_JUMP_IF_FALSE + 
 				Code.SIZE_JUMP_ALWAYS + conditionCode.size() ) );
+		/* Pop the original evaluation of the end condition off the stack
+		 * so the stack doesn't leak like a colander
+		 */
+		code.generateOp( Operation.POP );
 		return code;
 	}
     /*************************************************

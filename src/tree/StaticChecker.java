@@ -119,6 +119,12 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
                         left.getPosition() );
             }
         } else {
+        	/* Check left is not control variable in for statement */
+        	
+        	if ( ((ExpNode.VariableNode)left).getVariable().isControlVar() ) {
+        		staticError( "can't assign to for loop control variable",
+        				left.getPosition() );
+        	}
             /* Validate that the right expression is assignment
              * compatible with the left value. This may require that the 
              * right side expression is coerced to the dereferenced

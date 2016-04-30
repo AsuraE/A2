@@ -217,23 +217,39 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 		/* Generate the code to store the control variable at the start condition */
 		code.append( conVar );
 		code.append( genStore( conVarType ) );
+		/* Generate the code to evaluate the end condition */
+		code.append( endCond );
 		/* Generate code for comparison */
+		/* DUP the end condition so that it remains constant */
+		conditionCode.generateOp( Operation.DUP );
 		/* Load control variable */
 		conditionCode.append( node.getControlVariable().genCode( this ) );
 		conditionCode.append( genLoad( conVarType ) );
-		/* Evaluate end condition */
-		conditionCode.append( endCond );
 		/* Generate less operation */
-		conditionCode.generateOp( Operation.LESSEQ );
+		conditionCode.generateOp( Operation.LESS );
+		/* Negate the result */
+		conditionCode.genLoadConstant( 1 );
+		conditionCode.generateOp( Operation.XOR );
 		/* Generate the code for the loop body */
 		bodyCode.append( node.getLoopStmt().genCode( this ) );
 		/* Increment the control variable and store it */
+		/* Load the control variable twice */
 		bodyCode.append( conVar );
 		bodyCode.append( genLoad( conVarType ) );
+		bodyCode.append( conVar );
+		bodyCode.append( genLoad( conVarType ) );
+		/* Increment by 1 */
 		bodyCode.genLoadConstant( 1 );
 		bodyCode.generateOp( Operation.ADD );
+		/* Store the incremented control variable */
 		bodyCode.append( conVar );
 		bodyCode.append( genStore( conVarType ) );	
+		/* Load the incremented control variable */
+		bodyCode.append( conVar );
+		bodyCode.append( genLoad( conVarType ) );
+		/* Check if wrapped around at max int and jump to end if so */
+		bodyCode.generateOp( Operation.LESS );
+		bodyCode.genJumpIfFalse( Code.SIZE_JUMP_ALWAYS );
 		/* Append the condition code */
 		code.append( conditionCode );
 		/* Add a branch over the loop body if false */

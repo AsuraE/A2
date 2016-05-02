@@ -115,15 +115,18 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
         Type lvalType = left.getType();
         if( ! (lvalType instanceof Type.ReferenceType) ) {
             if( lvalType != Type.ERROR_TYPE ) {
+            	System.out.println("This is where we go to die");
                 staticError( "variable expected", 
                         left.getPosition() );
             }
         } else {
-        	/* Check left is not control variable in for statement */
-        	
-        	if ( ((ExpNode.VariableNode)left).getVariable().isControlVar() ) {
-        		staticError( "can't assign to for loop control variable",
-        				left.getPosition() );
+        	/* Check left can be cast to VariableNode (to stop arrays from breaking) */
+        	if( left instanceof ExpNode.VariableNode ) {
+	        	/* Check left is not control variable in for statement */
+	        	if( ((ExpNode.VariableNode)left).getVariable().isControlVar() ) {
+	        		staticError( "can't assign to for loop control variable",
+	        				left.getPosition() );
+	        	}
         	}
             /* Validate that the right expression is assignment
              * compatible with the left value. This may require that the 
@@ -410,6 +413,7 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
 	public ExpNode visitArrayNode(ExpNode.ArrayNode node) {
 		beginCheck("Array");
 		ExpNode lVal = node.getLVal().transform( this );
+		node.setLVal( lVal );
 		/* Check that the index type of the array is a subrange type */
 		Type lValType = lVal.getType().getArrayType();
 		if( lValType == null ) {
@@ -421,7 +425,7 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
 			Type.FunctionType fLValType = (Type.FunctionType)lValType;
 			Type argType = fLValType.getArgType();
 			argType.coerceExp( node.getCond() );
-			node.setType( fLValType.getResultType() );
+			node.setType( new Type.ReferenceType( fLValType.getResultType() ) );
 		}		
 		endCheck("Array");
 		return node;

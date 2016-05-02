@@ -424,12 +424,27 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
 	/** Generate code for an array node */
 	public Code visitArrayNode(ExpNode.ArrayNode node) {
 		Code code = node.getCond().genCode( this );
+		/* Load the condition. */
+		if( node.getCond().getType() instanceof Type.ReferenceType ) {
+			code.append( genLoad( node.getCond().getType() ) );
+		}
 		/* Generate bounds check */
-		int lower = node.getLVal().getType().getSubrangeType().getLower();
-		int upper = node.getLVal().getType().getSubrangeType().getUpper();
+		int lower = node.getLVal().getType().getArrayType().getArgType().getSubrangeType().getLower();
+		int upper = node.getLVal().getType().getArrayType().getArgType().getSubrangeType().getUpper();
+		int size = node.getLVal().getType().getArrayType().getArgType().getSubrangeType().getSpace();
 		code.genBoundsCheck(lower, upper);
 		/* If we've gotten here, then we have a valid index. Just need to calculate the offset */
-		
+		/* Index is now on the top of the stack */
+		code.genLoadConstant( lower );
+		/* Add the lower bound to the stack, then negate and add to perform a subtract */
+		code.generateOp( Operation.NEGATE );
+		code.generateOp( Operation.ADD );
+		/* Get the space size and multiply it by the current offset */
+		code.genLoadConstant( size );
+		code.generateOp( Operation.MPY );
+		/* Add the offset to the start of the array */
+		code.append( node.getLVal().genCode( this ) );
+		code.generateOp( Operation.ADD );
 		return code;
 	}
 }

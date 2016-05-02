@@ -423,7 +423,13 @@ public class CodeGenerator implements DeclVisitor, StatementTransform<Code>,
     
 	/** Generate code for an array node */
 	public Code visitArrayNode(ExpNode.ArrayNode node) {
-		// TODO
-		return null;
+		Code code = node.getCond().genCode( this );
+		/* Generate bounds check */
+		int lower = node.getLVal().getType().getSubrangeType().getLower();
+		int upper = node.getLVal().getType().getSubrangeType().getUpper();
+		code.genBoundsCheck(lower, upper);
+		/* If we've gotten here, then we have a valid index. Just need to calculate the offset */
+		
+		return code;
 	}
 }

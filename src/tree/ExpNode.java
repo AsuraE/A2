@@ -344,9 +344,13 @@ public abstract class ExpNode {
     
     /** Tree node representing an array */
     public static class ArrayNode extends ExpNode {
+    	private ExpNode lval;
+    	private ExpNode cond;
     	
     	public ArrayNode( Position pos, ExpNode lval, ExpNode cond ) {
     		super( pos );
+    		this.lval = lval;
+    		this.cond = cond;
     	}
     	@Override
     	public ExpNode transform( ExpTransform<ExpNode> visitor ) {
@@ -356,9 +360,21 @@ public abstract class ExpNode {
     	public Code genCode( ExpTransform<Code> visitor ) {
     		return visitor.visitArrayNode( this );
     	}
+    	public ExpNode getLVal() {
+    		return lval;
+    	}
+    	public void setLVal( ExpNode lval ) {
+    		this.lval = lval;
+    	}
+    	public ExpNode getCond() {
+    		return cond;
+    	}
+    	public void setCond( ExpNode cond ) {
+    		this.cond = cond;
+    	}
     	@Override
     	public String toString() {
-    		return "";
+    		return lval.toString() + "[" + cond.toString() + "]";
     	}
     }
 }

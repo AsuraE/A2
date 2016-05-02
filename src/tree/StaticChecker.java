@@ -220,7 +220,8 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
     	}
     	// Declare the control variable of the for loop
     	symtab.extendCurrentScope();
-    	symtab.getCurrentScope().addVariable( node.getId(), node.getPosition(), new Type.ReferenceType( c1.getType() ) ).setControlVar( true );
+    	symtab.getCurrentScope().addVariable( node.getId(), node.getPosition(), 
+    			new Type.ReferenceType( c1.getType() ) ).setControlVar( true );
     	// Check the control variable
     	node.setControlVariable( node.getControlVariable().transform( this ) );
     	// Check the body of the loop.
@@ -407,7 +408,23 @@ public class StaticChecker implements DeclVisitor, StatementVisitor,
     }
 	
 	public ExpNode visitArrayNode(ExpNode.ArrayNode node) {
-		return null;
+		beginCheck("Array");
+		ExpNode lVal = node.getLVal().transform( this );
+		/* Check that the index type of the array is a subrange type */
+		Type lValType = lVal.getType().getArrayType();
+		if( lValType == null ) {
+			staticError( "index type of an array must be a subrange", node.getPosition() );
+		} else {
+			/* Check that the element can be coerced to the the  type */
+			ExpNode cond = node.getCond().transform( this );
+			node.setCond( cond );
+			Type.FunctionType fLValType = (Type.FunctionType)lValType;
+			Type argType = fLValType.getArgType();
+			argType.coerceExp( node.getCond() );
+			node.setType( fLValType.getResultType() );
+		}		
+		endCheck("Array");
+		return node;
 	}
 
     /**************************** Support Methods ***************************/
